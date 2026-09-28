@@ -1,1 +1,43 @@
-# gag
+# Git
+.git
+.gitignore
+
+# Виртуальное окружение и зависимости
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Кэш Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+coverage.xml
+
+# IDE и метаданные
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Локальные конфиги и секреты
+.env
+.env.*
+!/.env.example
+
+# Тесты и документация (если не нужны в образе)
+tests/
+test_*.py
+*.md
+README.md
+
+# Логи и временные файлы
+*.log
+logs/
+tmp/
+temp/
