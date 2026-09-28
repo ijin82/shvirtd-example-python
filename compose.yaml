@@ -41,8 +41,7 @@ services:
       backend:
         ipv4_address: 172.20.0.10
     healthcheck:
-      # встроенный скрипт в официальном образе mysql:8
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       timeout: 5s
       retries: 10
