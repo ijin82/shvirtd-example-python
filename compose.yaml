@@ -5,7 +5,7 @@ services:
   web:
     build:
       dockerfile: Dockerfile.python
-    # Сервис должен всегда перезапускаться в случае ошибок.
+    # сервис должен всегда перезапускаться в случае ошибок.
     # лучше бы было видимо "unless-stopped" потому что
     # в этом случае после ручной остановки перезапуска не будет
     restart: always
@@ -30,8 +30,10 @@ services:
   db:
     image: mysql:8
     # проблема с нативным паролем, нужно для задачи с бекапом
-    command: --mysql-native-password=ON
-    # Сервис должен всегда перезапускаться в случае ошибок.
+    # mysql-native-password=ON — загружает плагин mysql_native_password
+    # authentication-policy=mysql_native_password — делает дефолтным для всех новых пользователей
+    command: --mysql-native-password=ON --authentication-policy=mysql_native_password
+    # сервис должен всегда перезапускаться в случае ошибок.
     restart: always
     env_file:
       - .env
