@@ -23,6 +23,9 @@ services:
       # тип bridge по умолчанию
       backend:
         ipv4_address: 172.20.0.5
+    depends_on:
+      db:
+        condition: service_healthy
 
   db:
     image: mysql:8
@@ -37,6 +40,13 @@ services:
       # backend и иметь фиксированный ipv4-адрес 172.20.0.10      
       backend:
         ipv4_address: 172.20.0.10
+    healthcheck:
+      # встроенный скрипт в официальном образе mysql:8
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
 
 # db_data — это Docker named volume (именованный том). Он хранится в 
 # Docker's data directory (обычно /var/lib/docker/volumes/db_data/), а не в 
