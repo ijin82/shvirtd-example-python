@@ -29,6 +29,8 @@ services:
 
   db:
     image: mysql:8
+    # проблема с нативным паролем, нужно для задачи с бекапом
+    command: --mysql-native-password=ON
     # Сервис должен всегда перезапускаться в случае ошибок.
     restart: always
     env_file:
