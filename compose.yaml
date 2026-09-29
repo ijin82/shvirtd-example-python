@@ -17,6 +17,7 @@ services:
       - DB_USER=${MYSQL_USER}
       - DB_PASSWORD=${MYSQL_PASSWORD}
       - DB_NAME=${MYSQL_DATABASE}
+      - TABLE_NAME=${TABLE_NAME}
     networks:
       # Контейнер должен работать в bridge-сети с названием 
       # backend и иметь фиксированный ipv4-адрес 172.20.0.5

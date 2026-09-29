@@ -13,13 +13,14 @@ db_host = os.environ.get('DB_HOST', '127.0.0.1')
 db_user = os.environ.get('DB_USER', 'app')
 db_password = os.environ.get('DB_PASSWORD', 'very_strong')
 db_name = os.environ.get('DB_NAME', 'example')
+table_name = os.environ.get('TABLE_NAME', 'requests')
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Код, который выполнится перед запуском приложения
     print("Приложение запускается...")
     if ensure_table_exists():
-        print("Соединение с БД установлено и таблица 'requests' готова к работе.")
+        print(f"""Соединение с БД установлено и таблица '{table_name}' готова к работе.""")
     else:
         print("БД недоступна при старте. Таблица будет создана при первом запросе.")
         
@@ -57,12 +58,12 @@ def get_db_connection():
 
 # --- 2.1. Функция создания таблицы ---
 def ensure_table_exists():
-    """Создает таблицу requests если она не существует"""
+    """Создает таблицу {table_name} если она не существует"""
     try:
         with get_db_connection() as db:
             cursor = db.cursor()
             create_table_query = f"""
-            CREATE TABLE IF NOT EXISTS {db_name}.requests (
+            CREATE TABLE IF NOT EXISTS {db_name}.{table_name} (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 request_date DATETIME,
                 request_ip VARCHAR(255)
@@ -93,7 +94,7 @@ def index(request: Request, ip_address: Optional[str] = Depends(get_client_ip)):
     try:
         with get_db_connection() as db:
             cursor = db.cursor()
-            query = "INSERT INTO requests (request_date, request_ip) VALUES (%s, %s)"
+            query = f"""INSERT INTO {table_name} (request_date, request_ip) VALUES (%s, %s)"""
             values = (current_time, final_ip)
             cursor.execute(query, values)
             db.commit()
@@ -102,7 +103,7 @@ def index(request: Request, ip_address: Optional[str] = Depends(get_client_ip)):
         ensure_table_exists()
         with get_db_connection() as db:
             cursor = db.cursor()
-            query = "INSERT INTO requests (request_date, request_ip) VALUES (%s, %s)"
+            query = f"""INSERT INTO {table_name} (request_date, request_ip) VALUES (%s, %s)"""
             values = (current_time, final_ip)
             cursor.execute(query, values)
             db.commit()
@@ -133,11 +134,11 @@ def debug_headers(request: Request):
 # --- 6. Эндпоинт для просмотра записей в БД ---
 @app.get("/requests")
 def get_requests():
-    """Возвращает все записи из таблицы requests для проверки"""
+    """Возвращает все записи из таблицы {table_name} для проверки"""
     try:
         with get_db_connection() as db:
             cursor = db.cursor()
-            query = "SELECT id, request_date, request_ip FROM requests ORDER BY id DESC LIMIT 50"
+            query = f"""SELECT id, request_date, request_ip FROM {table_name} ORDER BY id DESC LIMIT 50"""
             cursor.execute(query)
             records = cursor.fetchall()
             cursor.close()
@@ -152,6 +153,7 @@ def get_requests():
                 })
             
             return {
+                # total is not correct here since we have limit 50 above
                 "total_records": len(result),
                 "records": result
             }
@@ -159,7 +161,7 @@ def get_requests():
         ensure_table_exists()
         with get_db_connection() as db:
             cursor = db.cursor()
-            query = "SELECT id, request_date, request_ip FROM requests ORDER BY id DESC LIMIT 50"
+            query = f"""SELECT id, request_date, request_ip FROM {table_name} ORDER BY id DESC LIMIT 50"""
             cursor.execute(query)
             records = cursor.fetchall()
             cursor.close()
